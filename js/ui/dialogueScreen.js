@@ -9,6 +9,7 @@ export default class DialogueScreen {
     this.continueButton.x = Math.floor(this.background.width * .75);
     this.continueButton.y = Math.floor(this.background.height * .8);
     this.continueButton.onclick = onContinue;
+    this.continueButton.ontouchstart = onContinue;
     this.dialogueText = getDialogueText(textToDisplay, screenWidth*0.95);
     this.dialogueText.x = screenWidth*0.03
     this.dialogueText.y = screenHeight*0.03
@@ -23,6 +24,7 @@ export default class DialogueScreen {
     this.dialogueText.text = text;
     if (onContinue) {
       this.continueButton.onclick = onContinue;
+      this.continueButton.ontouchstart = onContinue;
     }
     if (continueButtonText) {
       this.continueButton.children

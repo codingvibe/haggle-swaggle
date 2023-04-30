@@ -17,6 +17,7 @@ export function getMenuButton(buttonBackgroundTexture, iconTexture, buttonText, 
   container.eventMode = "static";
   // container.interactive = true;
   container.onclick = onClick;
+  container.ontouchstart = onClick;
   return container;
 }
 

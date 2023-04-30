@@ -21,6 +21,7 @@ export default class BuyScreen {
     this.closeButton.onclick = () => {
       parentContainer.visible = false;
     }
+    this.closeButton.ontouchstart = this.closeButton.onclick;
     this.closeButton.y = screenHeight * 0.02;
     this.closeButton.x = screenWidth * 0.95;
     this.container.addChild(this.closeButton);
@@ -63,6 +64,7 @@ function displayBuyButtons(container, buyButtons, moneyDisplay, player) {
       setButtonsEnabled(buyButtons, player.money);
       moneyDisplay.text = `\$${player.money.toFixed(2)}`
     }
+    buyButton.ontouchstart = buyButton.onclick;
     if (buyButton.refresh) {
       buyButton.refresh();
     }

@@ -11,6 +11,7 @@ export default class PowerupScreen {
       this.container.visible = false;
       onClose();
     };
+    this.closeWindowButton.ontouchstart = this.closeWindowButton.onclick;
     this.closeWindowButton.x = screenWidth * 0.95;
     this.closeWindowButton.y = screenHeight * 0.05;
     this.closeWindowButton.eventMode = "static";
@@ -42,6 +43,7 @@ function displayPowerups(container, powerupButtons, onClose) {
         buttonFunction();
         onClose();
       }
+      powerup.ontouchstart = powerup.onclick;
     }
     container.addChild(powerup);
   });

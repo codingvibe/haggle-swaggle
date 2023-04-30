@@ -7,7 +7,6 @@ export class Player {
     baseMoney,
     haggleAbility,
     persuasionAbility,
-    transactionSpeed,
     stock,
     boothAttractiveness,
     playerTexture,
@@ -21,7 +20,6 @@ export class Player {
     this.money = baseMoney;
     this.haggleAbility = haggleAbility;
     this.persuasionAbility = persuasionAbility;
-    this.transactionSpeed = transactionSpeed;
     this.stock = stock;
     const boothStandingArea = {
       "maxY": screenHeight - 100,
@@ -65,9 +63,5 @@ export class Player {
     } else {
       this.booth.addUpgrade(upgradeName);
     }
-  }
-
-  waitForTransaction(cb) {
-    setTimeout(cb, this.transactionSpeed)
   }
 }
