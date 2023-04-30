@@ -107,9 +107,8 @@ const numDifferentCustomerTextures = 5;
 const STARTING_CASH = 100; 
 const STARTING_HAGGLE = 0.3;
 const STARTING_PERSUASION = 0.2;
-const STARTING_TRANSACTION_SPEED = 3000;
 const STARTING_BOOTH_ATTRACTIVENESS = 0.05;
-const STARTING_PROCESSING_TIME = 2000;
+const STARTING_PROCESSING_TIME = 1250;
 const STARTING_STOCK = [
   {
     "name": "Weeb Stuff",
@@ -135,7 +134,7 @@ const playerTexture = await PIXI.Assets.load('player');
 const boothTextures = await PIXI.Assets.load(['booth', 'displayCase']);
 const boostTextures = await PIXI.Assets.load(['wackyArmMan', 'churros', 'mariachi']);
 const upgradeTextures = await PIXI.Assets.load(['luckyCat','fruitWater','upgradedBooth', 'upgradedDisplayCase', 'upgradedProcessing']);
-const currentPlayer = new Player(STARTING_CASH, STARTING_HAGGLE, STARTING_PERSUASION, STARTING_TRANSACTION_SPEED, STARTING_STOCK, STARTING_BOOTH_ATTRACTIVENESS, playerTexture, boothTextures, boostTextures, upgradeTextures, STARTING_PROCESSING_TIME, stageWidth, stageHeight);
+const currentPlayer = new Player(STARTING_CASH, STARTING_HAGGLE, STARTING_PERSUASION, STARTING_STOCK, STARTING_BOOTH_ATTRACTIVENESS, playerTexture, boothTextures, boostTextures, upgradeTextures, STARTING_PROCESSING_TIME, stageWidth, stageHeight);
 app.stage.addChild(currentPlayer.booth.container);
 currentPlayer.booth.container.x = stageWidth*0.02;
 currentPlayer.booth.container.y = stageHeight - currentPlayer.booth.container.height;
@@ -234,17 +233,21 @@ computerSprite.onclick = () => {
   buyScreen.updateBuyButtons(stockButtons);
   buyScreen.container.visible = true;
 }
+computerSprite.ontouchstart = computerSprite.onclick;
+
 bookshelfSprite.eventMode = "static";
 bookshelfSprite.onclick = () => {
   buyScreen.updateBuyButtons(boothUpgradesButtons);
   buyScreen.container.visible = true;
 }
+bookshelfSprite.ontouchstart = bookshelfSprite.onclick;
 
 workbenchSprite.eventMode = "static";
 workbenchSprite.onclick = () => {
   buyScreen.updateBuyButtons(boothBoostButtons);
   buyScreen.container.visible = true;
 }
+workbenchSprite.ontouchstart = workbenchSprite.onclick;
 
 PIXI.Assets.add('nextDayMenu', 'assets/sunrise.png');
 const nextDaySprite = await PIXI.Assets.load('nextDayMenu');
@@ -279,6 +282,7 @@ const boothBoostMenuButton = getMenuButton(haggleTextures['generalPurposeButton'
   }
 });
 
+// TODO: update this to have an update function for player stock
 const useBoothBoostButtons = Object.keys(BOOTH_BOOSTS).map(boothBoostName => {
   return getUseBoothBoostButton(currentPlayer, boothBoostName, haggleTextures['generalPurposeButton'], boostTextures[boothBoostName])
 });
@@ -316,7 +320,7 @@ for (let i = 0; i < maxCustomers; i++) {
 // TODO: set this to the height of the stage.
 const customerSpawnBox = {
   "maxY": 1080,
-  "minY": 1080 * 2 / 3
+  "minY": 1080 * 0.4
 }
 
 // Game Loop
@@ -334,7 +338,7 @@ const logicInterval = setInterval(() => {
     const shouldSpawnCustomers = currentCustomers.length < maxCustomers && customerSprites.length > 0 && Math.random() < customerSpawnRate && loopsDone % 25 == 0
     if (shouldSpawnCustomers && currentScene == "fleaMarket") {
       const newCustomer = createNewCustomer(haggleScreen);
-      newCustomer.sprite.y = newCustomer.moveDirection == "UP" ? customerSpawnBox.maxY : customerSpawnBox.minY - newCustomer.sprite.texture.height
+      newCustomer.sprite.y = newCustomer.moveDirection == "UP" ? customerSpawnBox.maxY : customerSpawnBox.minY
       newCustomer.sprite.x = getCustomerXSpawn();
       newCustomer.indicator.y = newCustomer.sprite.y - newCustomer.indicator.height;
       newCustomer.indicator.x = newCustomer.sprite.x + newCustomer.sprite.width/2;
@@ -366,9 +370,9 @@ const logicInterval = setInterval(() => {
         customersToVillain.push(i);
       } else {
         customer.sprite.y += customer.moveSpeed * (customer.moveDirection == "UP" ? -1 : 1);
-        resizeCustomer(customerSpawnBox.maxY, customerSpawnBox.minY, customer, 0.6);
+        resizeCustomer(customerSpawnBox.maxY, customerSpawnBox.minY, customer, 0.3);
         customer.sprite.zIndex = Math.floor(customer.sprite.y/10);
-        if (customer.sprite.y > customerSpawnBox.maxY || customer.sprite.y + customer.sprite.texture.height < customerSpawnBox.minY) {
+        if (customer.sprite.y > customerSpawnBox.maxY || customer.sprite.y < customerSpawnBox.minY) {
           console.log("Customer left without being served :(");
           customersToRemove.push(i);
         }
@@ -376,11 +380,12 @@ const logicInterval = setInterval(() => {
     }
 
     for (let i = 0; i < currentCustomers.length; i++) {
-      if (customersToRemove.indexOf(i) > -1) {
+      if (customersToRemove.includes(i)) {
         app.stage.removeChild(currentCustomers[i].sprite);
+        app.stage.removeChild(currentCustomers[i].indicator);
         customerSprites.push(currentCustomers[i].sprite);
         customerIndicators.push(currentCustomers[i].indicator);
-      } else if (customersToPlayer.indexOf(i) > -1) {
+      } else if (customersToPlayer.includes(i)) {
         const currCustomer = currentCustomers[i];
         const timeout = new Date().getTime() + currCustomer.maxWaitTime;
         const customerRefreshInterval = setInterval(() => {
@@ -400,12 +405,12 @@ const logicInterval = setInterval(() => {
         }, currCustomer.maxWaitTime/100);
         currCustomer.sprite.x = getNumberBetween(currentPlayer.booth.customerStandingArea.minX, currentPlayer.booth.customerStandingArea.maxX);
         currCustomer.sprite.y = getNumberBetween(currentPlayer.booth.customerStandingArea.minY, currentPlayer.booth.customerStandingArea.maxY);
+        resizeCustomer(customerSpawnBox.maxY, customerSpawnBox.minY, currCustomer, 0.8);
         currCustomer.indicator.x = currCustomer.sprite.x + currCustomer.indicator.width/2;
         currCustomer.indicator.y = currCustomer.sprite.y - currCustomer.indicator.height;
         currCustomer.indicator.visible = true;
-        resizeCustomer(customerSpawnBox.maxY, customerSpawnBox.minY, currCustomer, 0.8);
         currCustomer.isAtPlayerBooth = true;
-      } else if (customersToVillain.indexOf(i) > -1) {
+      } else if (customersToVillain.includes(i)) {
         const currCustomer = currentCustomers[i];
         currCustomer.sprite.x = getNumberBetween(villain.booth.customerStandingArea.minX, villain.booth.customerStandingArea.maxX);
         currCustomer.sprite.y = getNumberBetween(villain.booth.customerStandingArea.minY, villain.booth.customerStandingArea.maxY);
@@ -429,8 +434,7 @@ const logicInterval = setInterval(() => {
       currentCustomers.forEach(customer => {
         if (customer.isHaggling) {
           app.stage.removeChild(customer.sprite)
-          customerSprites.push(customer.sprite);
-          customerIndicators.push(customer.indicator);
+          app.stage.removeChild(customer.indicator)
         }
       })
       haggleScreen.container.visible = false;
@@ -466,6 +470,8 @@ const logicInterval = setInterval(() => {
         currentPlayer.money = roundStartSnapshot.money;
         currentPlayer.boostStock = {...roundStartSnapshot.boostStock};
         villain.money = roundStartSnapshot.villainMoney;
+        playerMoneyDisplay.text = `\$${currentPlayer.money.toFixed(2)}`;
+        villainMoneyDisplay.text = `\$${villain.money.toFixed(2)}`;
         const useBoothBoostButtons = Object.keys(BOOTH_BOOSTS).map(boothBoostName => {
           return getUseBoothBoostButton(currentPlayer, boothBoostName, haggleTextures['generalPurposeButton'], boostTextures[boothBoostName])
         });
@@ -484,8 +490,8 @@ const logicInterval = setInterval(() => {
 }, 20)
 
 function createNewCustomer(haggleScreen) {
-  const newCustomerSprite = customerSprites.pop();
-  const customerIndicator = customerIndicators.pop();
+  const newCustomerSprite = new PIXI.Sprite();
+  const customerIndicator = new PIXI.Graphics();
   const newCustomer = new Customer(
     newCustomerSprite,
     customerIndicator,
@@ -519,10 +525,9 @@ function createNewCustomer(haggleScreen) {
                   .sort((a,b) => STOCK[a.name].sellPrice - STOCK[b.name].sellPrice)
                   .slice(-1)[0];
       }
-      if (!stock || stock.inventory == 0) {
+      if (!stock) {
         app.stage.removeChild(newCustomer.sprite);
-        customerSprites.push(newCustomer.sprite);
-        customerIndicators.push(newCustomer.indicator);
+        app.stage.removeChild(newCustomer.indicator);
         return;
       }
 
@@ -545,8 +550,7 @@ function createNewCustomer(haggleScreen) {
           if (newCustomer.isFrustratedByHaggling()) {
             console.log("Customer is fed up with haggling. Dirty pool, old chap")
             app.stage.removeChild(newCustomer.sprite);
-            customerSprites.push(newCustomer.sprite);
-            customerIndicators.push(newCustomer.indicator);
+            app.stage.removeChild(newCustomer.indicator);
             haggleScreen.container.visible = false;
             newCustomer.isHaggling = false;
           } else {
@@ -566,8 +570,7 @@ function createNewCustomer(haggleScreen) {
           currentPlayer.addMoney(haggleScreen.currentCustomerPrice)
           playerMoneyDisplay.text = `\$${currentPlayer.money.toFixed(2)}`
           app.stage.removeChild(newCustomer.sprite);
-          customerSprites.push(newCustomer.sprite);
-          customerIndicators.push(newCustomer.indicator);
+          app.stage.removeChild(newCustomer.indicator);
           for (let i = 0; i < currentPlayer.stock.length; i++ ) {
             if (currentPlayer.stock[i].name == stock.name) {
               currentPlayer.stock[i].inventory -= 1;
@@ -578,8 +581,7 @@ function createNewCustomer(haggleScreen) {
         },
         () => {
           app.stage.removeChild(newCustomer.sprite);
-          customerSprites.push(newCustomer.sprite);
-          customerIndicators.push(newCustomer.indicator);
+          app.stage.removeChild(newCustomer.indicator);
           haggleScreen.container.visible = false;
           newCustomer.isHaggling = false;
         }
@@ -588,7 +590,8 @@ function createNewCustomer(haggleScreen) {
       haggleScreen.container.y = stageHeight*.1;
       haggleScreen.container.zIndex = 500;
     }
-  }
+  };
+  newCustomer.sprite.ontouchstart = newCustomer.sprite.onclick;
   console.log("Spawned new customer!")
   currentCustomers.push(newCustomer);
   return newCustomer;
@@ -699,8 +702,7 @@ function villainCustomerResolver (result) {
   console.log("Processed customer for villain!")
   console.log(result);
   app.stage.removeChild(result.customer.sprite);
-  customerSprites.push(result.customer.sprite);
-  customerIndicators.push(result.customer.indicator);
+  app.stage.removeChild(result.customer.indicator);
 }
 
 setInterval(() => {

@@ -86,8 +86,11 @@ export default class HaggleScreen {
 
   updateInteractions(onHaggle, onAccept, onReject) {
     this.haggleButton.onclick = onHaggle;
+    this.haggleButton.ontouchstart = onHaggle;
     this.acceptButton.onclick = onAccept;
+    this.acceptButton.ontouchstart = onAccept;
     this.rejectButton.onclick = onReject;
+    this.rejectButton.ontouchstart = onReject;
   }
 
   setIsInteractive(interactive) {

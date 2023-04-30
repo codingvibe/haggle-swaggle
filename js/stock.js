@@ -118,6 +118,7 @@ export function getStockBuyButton(player, stockName, uiButtonTexture, iconTextur
       console.log(`You broke, can't afford ${stockName}`)
     }
   };
+  container.ontouchstart = container.onclick;
   setButtonEnabled(container, player.money > STOCK[stockName].buyPrice);
   container.shouldBeEnabled = (money) => {
     return money >= STOCK[stockName].buyPrice*5;

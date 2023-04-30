@@ -131,7 +131,7 @@ export function getVillainList(screenHeight, screenWidth, villainTextures, villa
     "sprites/hipster.png",
     100,
     0.4,
-    0.3,
+    0.25,
     2500,
     [
       {
@@ -147,7 +147,7 @@ export function getVillainList(screenHeight, screenWidth, villainTextures, villa
         "inventory": 40
       }
     ],
-    0.07,
+    0.04,
     screenWidth,
     screenHeight,
     villainTextures['hipster'],
@@ -161,7 +161,7 @@ export function getVillainList(screenHeight, screenWidth, villainTextures, villa
     "sprites/satan.png",
     100,
     0.5,
-    0.5,
+    0.3,
     1000,
     [
       {
@@ -189,7 +189,7 @@ export function getVillainList(screenHeight, screenWidth, villainTextures, villa
         "inventory": 1000
       }
     ],
-    0.1,
+    0.075,
     screenWidth,
     screenHeight,
     villainTextures['satan'],

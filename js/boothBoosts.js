@@ -69,6 +69,7 @@ export function getBoothBoostBuyButton(player, boothBoostName, uiButtonTexture, 
       console.log(`You broke, can't afford ${boothBoostName}`)
     }
   };
+  container.ontouchstart = container.onclick;
   setButtonEnabled(container, player.money > BOOTH_BOOSTS[boothBoostName].buyPrice);
   container.shouldBeEnabled = (money) => {
     return money >= BOOTH_BOOSTS[boothBoostName].buyPrice;
@@ -101,6 +102,7 @@ export function getUseBoothBoostButton(player, boothBoostName, uiButtonTexture, 
       console.log(`You have no ${boothBoostName} stock`)
     }
   };
+  container.ontouchstart = container.onclick;
   container.eventMode = "static";
   return container;
 }

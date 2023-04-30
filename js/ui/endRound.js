@@ -13,6 +13,7 @@ export default class EndRound {
     this.retryButton.x = Math.floor(this.background.width * .6);
     this.retryButton.y = Math.floor(this.background.height * .8);
     this.retryButton.onclick = onRetry;
+    this.retryButton.ontouchstart = onRetry;
     this.congratsMessage = new PIXI.Text("Congrats! A Winner You Are!" , {fontFamily : 'Verdana', fontSize: 48, fill : 0x00ff00, align : 'left', dropShadow: true, dropShadowDistance: 3});
     this.congratsMessage.x = Math.floor((this.background.width - this.congratsMessage.width)/2)
     this.congratsMessage.y = Math.floor(this.background.height * 0.2);
@@ -46,9 +47,11 @@ export default class EndRound {
     this.playerStats.text = formatStats(playerStats);
     if (onContinue) {
       this.continueButton.onclick = onContinue;
+      this.continueButton.ontouchstart = onContinue
     }
     if (onRetry) {
       this.retryButton.onclick = onRetry;
+      this.retryButton.ontouchstart = onRetry;
     }
   }
 }

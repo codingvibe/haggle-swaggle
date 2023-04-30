@@ -28,7 +28,7 @@ export const BOOTH_UPGRADES = {
   "upgradedProcessing": {
     "textureName": "upgradedProcessing",
     "description": "Process customers faster with this fast talkin' mod",
-    "processingTime": 750,
+    "processingTime": 500,
     "buyPrice": 150
   }
 }
@@ -70,6 +70,7 @@ export function getBoothUpgradeButton(player, boothUpgradeName, uiButtonTexture,
       console.log(`You broke, can't afford ${boothUpgradeName}`)
     }
   };
+  container.ontouchstart = container.onclick;
   if (player.booth.upgrades.includes(boothUpgradeName)) {
     disableUpgrade(container);
   }
